@@ -2,8 +2,7 @@
 [![Docker Image Version (latest by date)](https://img.shields.io/docker/v/nicholaswilde/template)](https://hub.docker.com/r/nicholaswilde/template)
 [![Docker Pulls](https://img.shields.io/docker/pulls/nicholaswilde/template)](https://hub.docker.com/r/nicholaswilde/template)
 [![GitHub](https://img.shields.io/github/license/nicholaswilde/docker-template)](./LICENSE)
-[![hadolint](https://github.com/nicholaswilde/docker-cryptpad/workflows/hadolint/badge.svg?branch=main)](https://github.com/nicholaswilde/docker-template/actions?query=workflow%3Ahadolint)
-[![yamllint](https://github.com/nicholaswilde/docker-cryptpad/workflows/yamllint/badge.svg?branch=main)](https://github.com/nicholaswilde/docker-template/actions?query=workflow%3Ayamllint)
+[![lint](https://github.com/nicholaswilde/docker-cryptpad/workflows/lint/badge.svg?branch=main)](https://github.com/nicholaswilde/docker-template/actions?query=workflow%3Alint)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 A template repo for Docker images.
