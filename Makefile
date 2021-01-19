@@ -1,5 +1,6 @@
 include make.env
 
+BUILD_DATE ?= $(shell date -u +%Y-%m-%dT%H%M%SZ)
 NS ?= nicholaswilde
 VERSION ?= 0.1.0
 LS ?= 1
