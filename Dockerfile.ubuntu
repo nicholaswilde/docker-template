@@ -12,5 +12,5 @@ RUN \
   apt-get clean && \
   rm -rf \
     /tmp/* \
-	  /var/lib/apt/lists/* \
+	  /var/lib/apt/lists/ \
 	  /var/tmp/*
