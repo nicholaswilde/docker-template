@@ -2,8 +2,8 @@
 version: "2.1"
 services:
   installer:
-    image: nicholaswilde/cryptpad:latest
-    container_name: cryptpad
+    image: nicholaswilde/template:latest
+    container_name: template
     ports:
       - 3000:3000
     restart: unless-stopped

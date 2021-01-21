@@ -27,6 +27,14 @@ services:
     ports:
       - 3000:3000
     restart: unless-stopped
+    volumes:
+      - app:/app
+      - config:/config
+      - defaults:/defaults
+volumes:
+  app:
+  config:
+  defaults:
 ```
 ### docker cli
 ```bash
