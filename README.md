@@ -2,7 +2,8 @@
 [![Docker Image Version (latest by date)](https://img.shields.io/docker/v/nicholaswilde/template)](https://hub.docker.com/r/nicholaswilde/template)
 [![Docker Pulls](https://img.shields.io/docker/pulls/nicholaswilde/template)](https://hub.docker.com/r/nicholaswilde/template)
 [![GitHub](https://img.shields.io/github/license/nicholaswilde/docker-template)](./LICENSE)
-[![lint](https://github.com/nicholaswilde/docker-cryptpad/workflows/lint/badge.svg?branch=main)](https://github.com/nicholaswilde/docker-template/actions?query=workflow%3Alint)
+[![ci](https://github.com/nicholaswilde/docker-template/workflows/ci/badge.svg)](https://github.com/nicholaswilde/docker-template/actions?query=workflow%3Aci)
+[![lint](https://github.com/nicholaswilde/docker-template/workflows/lint/badge.svg?branch=main)](https://github.com/nicholaswilde/docker-template/actions?query=workflow%3Alint)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 A template repo for Docker images.
@@ -16,9 +17,9 @@ A template repo for Docker images.
 ---
 version: "2.1"
 services:
-  cryptpad:
-    image: nicholaswilde/cryptpad
-    container_name: cryptpad
+  template:
+    image: nicholaswilde/template
+    container_name: template
     environment:
       - TZ=America/Los_Angeles #optional
       - PUID=1000   #optional
@@ -30,13 +31,13 @@ services:
 ### docker cli
 ```bash
 $ docker run -d \
-  --name=cryptpad \
+  --name=template \
   -e TZ=America/Los_Angeles `# optional` \
   -e PUID=1000  `# optional` \
   -e PGID=1000   `# optional` \
   -p 3000:3000 \
   --restart unless-stopped \
-  nicholaswilde/cryptpad
+  nicholaswilde/template
 ```
 
 ## Build
