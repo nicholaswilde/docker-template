@@ -5,10 +5,6 @@ NS ?= nicholaswilde
 VERSION ?= 0.1.0
 LS ?= 1
 
-IMAGE_NAME ?= template
-CONTAINER_NAME ?= template
-CONTAINER_INSTANCE ?= default
-
 .PHONY: push push-latest run rm help vars shell prune
 
 ## all		: Build all platforms
