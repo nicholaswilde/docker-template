@@ -68,6 +68,9 @@ stop:
 checksum:
 	wget https://sourceforge.net/projects/forma/files/version-2.x/formalms-v$(VERSION).zip/download -O- -q | sha256sum
 
+test:
+	snyk container test $(NS)/$(IMAGE_NAME):$(VERSION)-ls$(LS) --file=Dockerfile
+
 ## help   	: Show help
 help: Makefile
 	@sed -n 's/^##//p' $<
