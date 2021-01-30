@@ -1,9 +1,6 @@
 include make.env
 
 BUILD_DATE ?= $(shell date -u +%Y-%m-%dT%H%M%SZ)
-NS ?= nicholaswilde
-VERSION ?= 0.1.0
-LS ?= 1
 
 .PHONY: push push-latest run rm help vars shell prune
 
@@ -19,8 +16,17 @@ build: Dockerfile
 build-latest: Dockerfile
 	docker buildx build -t $(NS)/$(IMAGE_NAME):latest --build-arg VERSION=$(VERSION) --build-arg CHECKSUM=$(CHECKSUM) --build-arg BUILD_DATE=$(BUILD_DATE) -f Dockerfile .
 
+## checksum	: Get the checksum of a file
+checksum:
+	wget -qO- "https://github.com/nicholaswilde/docker-installer/archive/$(VERSION).tar.gz" | sha256sum
+
+## date		: Check the image date
 date:
 	docker exec -it $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) date
+
+## lint		: Lint the Dockerfile with hadolint
+lint:	Dockerfile
+	hadolint Dockerfile && yamllint .
 
 ## load   	: Load the release image
 load: Dockerfile
@@ -29,6 +35,10 @@ load: Dockerfile
 ## load-latest  	: Load the latest image
 load-latest: Dockerfile
 	docker buildx build -t $(NS)/$(IMAGE_NAME):latest -f Dockerfile --load .
+
+## monitor	: Monitor the image with snyk
+monitor:
+	snyk container monitor $(NS)/$(IMAGE_NAME):$(VERSION)-ls$(LS)
 
 ## prune		: Prune the docker builder
 prune:
@@ -59,15 +69,13 @@ rund:
 	docker run -d --rm --name $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) $(PORTS) $(ENV) $(NS)/$(IMAGE_NAME):$(VERSION)-ls$(LS)
 
 shell:
-	docker run --rm $(PORTS) $(ENV) $(NS)/$(IMAGE_NAME):$(VERSION)-ls$(LS) /bin/bash
+	docker run --rm -it $(PORTS) $(ENV) $(NS)/$(IMAGE_NAME):$(VERSION)-ls$(LS) /bin/bash
 
 ## stop   	: Stop the Docker container
 stop:
 	docker stop $(CONTAINER_NAME)-$(CONTAINER_INSTANCE)
 
-checksum:
-	wget https://sourceforge.net/projects/forma/files/version-2.x/formalms-v$(VERSION).zip/download -O- -q | sha256sum
-
+## test		: Test the image with snyk
 test:
 	snyk container test $(NS)/$(IMAGE_NAME):$(VERSION)-ls$(LS) --file=Dockerfile
 
@@ -77,13 +85,13 @@ help: Makefile
 
 ## vars   	: Show all variables
 vars:
-	@echo VERSION   : $(VERSION)
-	@echo NS        : $(NS)
-	@echo IMAGE_NAME      : $(IMAGE_NAME)
-	@echo CONTAINER_NAME    : $(CONTAINER_NAME)
-	@echo CONTAINER_INSTANCE  : $(CONTAINER_INSTANCE)
-	@echo PORTS : $(PORTS)
-	@echo ENV : $(ENV)
-	@echo PLATFORMS : $(PLATFORMS)
+	@printf "VERSION 		: %s\n" "$(VERSION)"
+	@printf "NS        		: %s\n" "$(NS)"
+	@printf "IMAGE_NAME		: %s\n" "$(IMAGE_NAME)"
+	@printf "CONTAINER_NAME		:%s\n" " $(CONTAINER_NAME)"
+	@printf "CONTAINER_INSTANCE	: %s\n" "$(CONTAINER_INSTANCE)"
+	@printf "PORTS 			: %s\n" "$(PORTS)"
+	@printf "ENV 			: %s\n" "$(ENV)"
+	@echo "PLATFORMS 		: $(PLATFORMS)"
 
 default: build
