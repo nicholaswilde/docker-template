@@ -8,35 +8,13 @@
 
 A template repo for Docker images.
 
-## Requirements
-- [buildx](https://docs.docker.com/engine/reference/commandline/buildx/)
+## Dependencies
+
+* None
 
 ## Usage
-### docker-compose
-```
----
-version: "2.1"
-services:
-  template:
-    image: nicholaswilde/template
-    container_name: template
-    environment:
-      - TZ=America/Los_Angeles #optional
-      - PUID=1000   #optional
-      - PGID=1000   #optional
-    ports:
-      - 3000:3000
-    restart: unless-stopped
-    volumes:
-      - app:/app
-      - config:/config
-      - defaults:/defaults
-volumes:
-  app:
-  config:
-  defaults:
-```
 ### docker cli
+
 ```bash
 $ docker run -d \
   --name=template \
@@ -48,21 +26,17 @@ $ docker run -d \
   nicholaswilde/template
 ```
 
-## Build
+### docker-compose
 
-Check that you can build the following:
-```bash
-$ docker buildx ls
-NAME/NODE    DRIVER/ENDPOINT             STATUS  PLATFORMS
-mybuilder *  docker-container
-  mybuilder0 unix:///var/run/docker.sock running linux/amd64, linux/arm64, linux/arm/v7
-```
+See [docker-compose.yaml](./docker-compose.yaml).
 
-If you are having trouble building arm images on a x86 machine, see [this blog post](https://www.docker.com/blog/getting-started-with-docker-for-arm-on-linux/).
+## Development
 
-```
-$ make build
-```
+See [Wiki](./wiki/Development).
+
+## Troubleshooting
+
+See [Wiki](./wiki/Troubleshooting).
 
 ## Pre-commit hook
 
