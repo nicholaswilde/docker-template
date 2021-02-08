@@ -32,11 +32,11 @@ See [docker-compose.yaml](./docker-compose.yaml).
 
 ## Development
 
-See [Wiki](./wiki/Development).
+See [Wiki](../../wiki/Development).
 
 ## Troubleshooting
 
-See [Wiki](./wiki/Troubleshooting).
+See [Wiki](../../wiki/Troubleshooting).
 
 ## Pre-commit hook
 
