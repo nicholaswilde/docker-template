@@ -46,6 +46,10 @@ monitor:
 no-cache:
 	docker buildx build -t $(NS)/$(IMAGE_NAME):$(VERSION)-ls$(LS) $(BUILD) -f Dockerfile .
 
+## packages	: Display package versions
+packages:
+	docker run --rm -it "${BASE}" /bin/ash -c "apk update && apk policy ${PACKAGES}"
+
 ## prune		: Prune the docker builder
 prune:
 	docker builder prune --all
