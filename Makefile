@@ -20,7 +20,7 @@ build-latest: Dockerfile
 
 ## checksum	: Get the checksum of a file
 checksum:
-	wget -qO- "https://github.com/$(IMAGE_NAME)/$(IMAGE_NAME)/releases/download/v${VERSION}/Leantime-v${VERSION}.tar.gz" | sha256sum
+	wget -qO- --show-progress "https://github.com/$(IMAGE_NAME)/$(IMAGE_NAME)/releases/download/v${VERSION}/Leantime-v${VERSION}.tar.gz" | sha256sum
 
 ## date		: Check the image date
 date:
