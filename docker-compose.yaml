@@ -1,9 +1,9 @@
 ---
 version: "2.1"
 services:
-  installer:
+  template:
     image: nicholaswilde/template:latest
-    container_name: template
+    container_name: template-default
     ports:
       - 3000:3000
     restart: unless-stopped
