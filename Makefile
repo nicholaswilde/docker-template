@@ -66,6 +66,15 @@ push-latest: Dockerfile
 push-all: Dockerfile
 	docker buildx build -t $(NS)/$(IMAGE_NAME):$(VERSION)-ls$(LS) $(PLATFORMS) $(BUILD) -f Dockerfile --push .
 
+## packages : Display package versions
+packages:
+	docker run --rm -it "${BASE}" /bin/bash -c "apt-get update && apt-cache policy  ${PACKAGES}"
+	# docker run --rm -it "${BASE}" /bin/bash -c "apk update && apk policy  ${PACKAGES}"
+
+## readme   : Update the README.md by replacing template with the image name.
+readme: README.md
+	sed -i "s/template/$(IMAGE_NAME)/g" README.md
+
 ## rm   		: Remove the container
 rm: stop
 	docker rm $(CONTAINER_NAME)-$(CONTAINER_INSTANCE)
