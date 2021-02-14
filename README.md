@@ -49,8 +49,8 @@ If you want to automatically generate `README.md` files with a pre-commit hook, 
 to your project. Then run:
 
 ```bash
-pre-commit install
-pre-commit install-hooks
+$ pre-commit install
+$ pre-commit install-hooks
 ```
 Currently, this only works on `amd64` systems.
 
