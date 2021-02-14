@@ -6,7 +6,7 @@
 [![lint](https://github.com/nicholaswilde/docker-template/workflows/lint/badge.svg?branch=main)](https://github.com/nicholaswilde/docker-template/actions?query=workflow%3Alint)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
-A template repo for Docker images.
+A multi-architecture image for [template](https://github.com/nicholaswilde/docker-template).
 
 ## Dependencies
 
@@ -25,6 +25,10 @@ $ docker run -d \
   --restart unless-stopped \
   nicholaswilde/template
 ```
+
+|   user   | uid |
+|:--------:|:---:|
+| www-data |  33 |
 
 ### docker-compose
 
