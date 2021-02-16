@@ -4,7 +4,7 @@ BUILD_DATE ?= $(shell date -u +%Y-%m-%dT%H%M%S%Z)
 
 BUILD = --build-arg VERSION=$(VERSION) --build-arg CHECKSUM=$(CHECKSUM) --build-arg BUILD_DATE=$(BUILD_DATE)
 
-.PHONY: push push-latest run rm help vars shell prune
+.PHONY: checksum date monitor no-cache package prune run rund shell stop vars
 
 ## all		: Build all platforms
 all: Dockerfile
@@ -20,7 +20,7 @@ build-latest: Dockerfile
 
 ## checksum	: Get the checksum of a file
 checksum:
-	wget -qO- --show-progress "https://github.com/$(IMAGE_NAME)/$(IMAGE_NAME)/releases/download/v${VERSION}/Leantime-v${VERSION}.tar.gz" | sha256sum
+	wget -qO- --show-progress "${URL}" | sha256sum
 
 ## date		: Check the image date
 date:
@@ -43,12 +43,13 @@ monitor:
 	snyk container monitor $(NS)/$(IMAGE_NAME):$(VERSION)-ls$(LS)
 
 ## no-cache	: Build with no cache
-no-cache:
+no-cache: Dockerfile
 	docker buildx build -t $(NS)/$(IMAGE_NAME):$(VERSION)-ls$(LS) $(BUILD) -f Dockerfile .
 
-## packages	: Display package versions
+## packages : Display package versions
 packages:
-	docker run --rm -it "${BASE}" /bin/ash -c "apk update && apk policy ${PACKAGES}"
+	docker run --rm -it "${BASE}" /bin/sh -c "apk update && apk policy  ${PACKAGES}"
+	# docker run --rm -it "${BASE}" /bin/sh -c "apt-get update && apt-cache policy  ${PACKAGES}"
 
 ## prune		: Prune the docker builder
 prune:
@@ -65,11 +66,6 @@ push-latest: Dockerfile
 ## push-all 	: Push all release platform images
 push-all: Dockerfile
 	docker buildx build -t $(NS)/$(IMAGE_NAME):$(VERSION)-ls$(LS) $(PLATFORMS) $(BUILD) -f Dockerfile --push .
-
-## packages : Display package versions
-packages:
-	docker run --rm -it "${BASE}" /bin/bash -c "apt-get update && apt-cache policy  ${PACKAGES}"
-	# docker run --rm -it "${BASE}" /bin/bash -c "apk update && apk policy  ${PACKAGES}"
 
 ## readme   : Update the README.md by replacing template with the image name.
 readme: README.md
@@ -95,7 +91,7 @@ stop:
 	docker stop $(CONTAINER_NAME)-$(CONTAINER_INSTANCE)
 
 ## test		: Test the image with snyk
-test:
+test: Dockerfile
 	snyk container test $(NS)/$(IMAGE_NAME):$(VERSION)-ls$(LS) --file=Dockerfile
 
 ## help   	: Show help
@@ -115,5 +111,6 @@ vars:
 	@printf "CHECKSUM 		: %s\n" "$(CHECKSUM)"
 	@printf "BUILD_DATE 		: %s\n" "$(BUILD_DATE)"
 	@printf "BUILD 			: %s\n" "$(BUILD)"
+	@printf "URL 			: %s\n" "$(URL)"
 
 default: build

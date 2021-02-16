@@ -8,13 +8,13 @@ RUN \
   echo "**** install packages ****" && \
   apt-get update && \
   apt-get install -y --no-install-recommends \
-    wget \
-    ca-certificates && \
+    wget &&\
   echo "**** download app ****" && \
   mkdir /app && \
   wget "https://github.com/huginn/huginn/archive/${FILENAME}" && \
   echo "${CHECKSUM}  ${FILENAME}" | sha256sum -c && \
-  tar -xvf "${FILENAME}" --strip-components 1 -C /app 
+  tar -xvf "${FILENAME}" --strip-components 1 -C /app
+WORKDIR /app
 
 FROM ghcr.io/linuxserver/baseimage-ubuntu:bionic
 ARG BUILD_DATE
