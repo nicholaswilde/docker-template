@@ -1,0 +1,25 @@
+---
+version: '3'
+
+tasks:
+  install:
+    desc: Install buildx builder, mybuilder
+    cmds:
+      - "docker run --rm --privileged multiarch/qemu-user-static --reset -p yes"
+    status:
+      - "test -f ~/.docker/buildx/instances/mybuilder"
+
+  create:
+    desc: Create buildx builder, mybuilder
+    cmds:
+      - task: install
+      - "export DOCKER_BUILDKIT=1"
+      - "docker buildx create --use --name mybuilder"
+      - "docker buildx use mybuilder"
+      - "docker buildx inspect --bootstrap"
+      - "docker buildx install"
+
+  restart:
+    desc: Restart the builder container
+    cmds:
+      - "docker restart buildx_buildkit_mybuilder0"
