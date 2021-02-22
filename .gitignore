@@ -1,5 +1,6 @@
 .vagrant*
 bin
+.bin
 docker/docker
 .*.swp
 a.out
