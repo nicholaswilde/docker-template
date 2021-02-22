@@ -86,6 +86,16 @@ tasks:
     deps:
       - test-deps
 
+  packages-ubuntu:
+    desc: Show the Ubuntu package versions
+    cmds:
+      - "{{ .RUN }} {{ .BASE }} /bin/sh -c 'apt-get update && apt-cache policy {{ .PACKAGES }}'"
+
+  pip:
+    desc: Show the installed pip package versions
+    cmds:
+      - "{{ .RUN }} {{ .BASE }} /bin/sh -c 'pip install {{ .PIP }} && pip show {{ .PIP }}'"
+
   pre-commit:
     desc: Install pre-commit hooks
     cmds:
@@ -135,7 +145,7 @@ tasks:
   shell-run:
     desc: Get a shell of an image
     cmds:
-      - "{{ .RUN }} {{ .TAG_VERSION }} /bin/sh"
+      - "{{ .RUN }} --entrypoint /bin/sh -u 0 {{ .TAG_VERSION }}"
 
   stop:
     desc: Stop a running container
