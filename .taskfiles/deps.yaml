@@ -1,0 +1,84 @@
+---
+version: '3'
+
+vars:
+  SNYK_URL: "https://github.com/snyk/snyk/releases/download/v1.458.0/snyk-linux"
+  HADOLINT_URL: "https://github.com/hadolint/hadolint/releases/download/v1.22.1/hadolint-Linux-x86_64"
+
+tasks:
+  install:
+    desc: Install all developer dependencies
+    deps:
+      - distrib-reqs
+      - pre-commit
+      - snyk
+      - yamllint
+      - hadolint
+    silent: true
+
+  path-notify:
+    cmds:
+      - echo "Be sure to update your PATH, PATH=\$PATH:\$PWD/.bin"
+    silent: true
+
+  distrib-reqs:
+    cmds:
+      - task deps:need BIN=wget
+      - task deps:need BIN=python3
+      - task deps:need BIN=docker
+    silent: true
+
+  need:
+    cmds:
+      - type {{ .BIN }} 2>&1 >/dev/null || (echo "Please install {{ .BIN }}"; exit 1)
+    silent: true
+
+  yamllint:
+    desc: Install a precommit pip package
+    cmds:
+      - echo "Installing yamllint"
+      - python3 -m pip install --user yamllint
+    status:
+      - type yamllint
+    deps:
+      - distrib-reqs
+    silent: true
+
+  pre-commit:
+    desc: Install a pre-commit pip package
+    cmds:
+      - echo "Installing pre-commit"
+      - python3 -m pip install --user pre-commit
+    status:
+      - type pre-commit
+    deps:
+      - distrib-reqs
+    silent: true
+
+  snyk:
+    desc: Install snyk
+    cmds:
+      - echo "Installing snyk"
+      - mkdir -p ".bin"
+      - "wget -q {{ .SNYK_URL }} -O .bin/snyk"
+      - "chmod +x .bin/snyk"
+      - task: path-notify
+    status:
+      - test -e .bin/snyk
+    deps:
+      - distrib-reqs
+    silent: true
+
+  hadolint:
+    desc: Install hadolint
+    cmds:
+      - echo "Installing hadolint"
+      - mkdir -p ".bin"
+      - "wget -q {{ .HADOLINT_URL }} -O .bin/hadolint"
+      - "chmod +x .bin/hadolint"
+      - task: path-notify
+    status:
+      - test -e .bin/hadolint
+    deps:
+      - distrib-reqs
+    silent: true

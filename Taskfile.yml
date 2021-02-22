@@ -15,12 +15,16 @@ vars:
   GHCR_LATEST: "ghcr.io/{{ .TAG_LATEST }}"
   URL: "https://github.com/{{ .IMAGE_NAME }}/{{ .IMAGE_NAME }}/releases/download/v{{ .VERSION }}/Leantime-v{{ .VERSION }}.tar.gz"
   CONTAINER: "{{ .CONTAINER_NAME }}-{{ .CONTAINER_INSTANCE }}"
-  RUN: "docker run -it --rm {{ .ENV }} {{ .PORTS }}"
+  RUN: "docker run -it --rm --name {{ .CONTAINER_NAME }}-{{ .CONTAINER_INSTANCE }} {{ .ENV }} {{ .PORTS }}"
   EXEC: "docker exec -it {{ .ENV }} {{ .PORTS }} {{ .CONTAINER }}"
   BUILD: "docker buildx build {{ .BUILD_ARGS }} -t"
 
 includes:
+  build: ./.taskfiles/build.yaml
   builder: ./.taskfiles/builder.yaml
+  deps: ./.taskfiles/deps.yaml
+  pkgs: ./.taskfiles/pkgs.yaml
+  snyk: ./.taskfiles/snyk.yaml
 
 tasks:
 
@@ -31,27 +35,15 @@ tasks:
       - echo "{{ .QUAY_LATEST }}"
       - echo "{{ .GHCR_VERSION }}"
       - echo "{{ .GHCR_LATEST }}"
-
-  all:
-    desc: Build all platforms
-    cmds:
-      - "{{ .BUILD }} {{ .TAG_VERSION }} {{ .PLATFORMS }} -f Dockerfile ."
-    deps:
-      - build-deps
+    preconditions:
+      - sh: 'docker inspect --format "{{ json .State.Running }}" buildx_buildkit_mybuilder0'
 
   build:
     desc: Build the native Docker image
     cmds:
       - "{{ .BUILD }} {{ .TAG_VERSION }} -f Dockerfile ."
     deps:
-      - build-deps
-
-  build-latest:
-    desc: Build the latest Docker image
-    cmds:
-      - "{{ .BUILD }} {{ .TAG_LATEST }} -f Dockerfile ."
-    deps:
-      - build-deps
+      - build:build-deps
 
   date-exec:
     desc: Get the date of the container
@@ -59,9 +51,9 @@ tasks:
       - "{{ .EXEC }} date"
 
   date-run:
-    desc: Get the date of the container
+    desc: Get the date of the image
     cmds:
-      - "{{ .RUN }} date"
+      - "{{ .RUN }} --entrypoint date {{ .TAG_VERSION }}"
 
   lint:
     desc: Lint the repoistory
@@ -79,23 +71,6 @@ tasks:
     cmds:
       - "{{ .BUILD }} {{ .TAG_LATEST }} -f Dockerfile . --load"
 
-  monitor:
-    desc: Monitor the image with snyk
-    cmds:
-      - "snyk container monitor {{ .TAG_VERSION }}"
-    deps:
-      - test-deps
-
-  packages-ubuntu:
-    desc: Show the Ubuntu package versions
-    cmds:
-      - "{{ .RUN }} {{ .BASE }} /bin/sh -c 'apt-get update && apt-cache policy {{ .PACKAGES }}'"
-
-  pip:
-    desc: Show the installed pip package versions
-    cmds:
-      - "{{ .RUN }} {{ .BASE }} /bin/sh -c 'pip install {{ .PIP }} && pip show {{ .PIP }}'"
-
   pre-commit:
     desc: Install pre-commit hooks
     cmds:
@@ -103,7 +78,7 @@ tasks:
       - "pre-commit install-hooks"
     preconditions:
       - sh: pre-commit --version
-        msg: pre-commit is not installed
+        msg: "pre-commit is not installed. Run `task deps:pre-commit`"
 
   prune:
     desc: Prune the builder
@@ -140,7 +115,7 @@ tasks:
   shell-exec:
     desc: Get a shell of a running container
     cmds:
-      - "{{ .EXEC }} /bin/sh"
+      - "{{ .EXEC }} /bin/sh -u 0"
 
   shell-run:
     desc: Get a shell of an image
@@ -152,28 +127,10 @@ tasks:
     cmds:
       - "docker stop {{ .CONTAINER }}"
 
-  test:
-    desc: Test the image with snyk
-    cmds:
-      - "snyk container test {{ .TAG_VERSION }} --file=Dockerfile"
-    deps:
-      - test-deps
   up:
     desc: Run docker-compose up
     cmds:
       - docker-compose -f docker-compose.sqlite.yaml up
-
-  build-deps:
-    preconditions:
-      - sh: "docker buildx version"
-        msg: "buildx is not installed"
-    silent: true
-
-  test-deps:
-    preconditions:
-      - sh: "snyk version"
-        msg: "snyk is not installed"
-    silient: true
 
   default:
     cmds:
