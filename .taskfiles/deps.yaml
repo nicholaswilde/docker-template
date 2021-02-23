@@ -9,28 +9,11 @@ tasks:
   install:
     desc: Install all developer dependencies
     deps:
-      - distrib-reqs
+      - _distrib-reqs
       - pre-commit
       - snyk
       - yamllint
       - hadolint
-    silent: true
-
-  path-notify:
-    cmds:
-      - echo "Be sure to update your PATH, PATH=\$PATH:\$PWD/.bin"
-    silent: true
-
-  distrib-reqs:
-    cmds:
-      - task deps:need BIN=wget
-      - task deps:need BIN=python3
-      - task deps:need BIN=docker
-    silent: true
-
-  need:
-    cmds:
-      - type {{ .BIN }} 2>&1 >/dev/null || (echo "Please install {{ .BIN }}"; exit 1)
     silent: true
 
   yamllint:
@@ -41,7 +24,7 @@ tasks:
     status:
       - type yamllint
     deps:
-      - distrib-reqs
+      - _distrib-reqs
     silent: true
 
   pre-commit:
@@ -52,7 +35,7 @@ tasks:
     status:
       - type pre-commit
     deps:
-      - distrib-reqs
+      - _distrib-reqs
     silent: true
 
   snyk:
@@ -62,11 +45,11 @@ tasks:
       - mkdir -p ".bin"
       - "wget -q {{ .SNYK_URL }} -O .bin/snyk"
       - "chmod +x .bin/snyk"
-      - task: path-notify
+      - task: _path-notify
     status:
       - test -e .bin/snyk
     deps:
-      - distrib-reqs
+      - _distrib-reqs
     silent: true
 
   hadolint:
@@ -76,9 +59,26 @@ tasks:
       - mkdir -p ".bin"
       - "wget -q {{ .HADOLINT_URL }} -O .bin/hadolint"
       - "chmod +x .bin/hadolint"
-      - task: path-notify
+      - task: _path-notify
     status:
       - test -e .bin/hadolint
     deps:
-      - distrib-reqs
+      - _distrib-reqs
+    silent: true
+
+  _path-notify:
+    cmds:
+      - echo "Be sure to update your PATH, PATH=\$PATH:\$PWD/.bin"
+    silent: true
+
+  _distrib-reqs:
+    cmds:
+      - task deps:_need BIN=wget
+      - task deps:_need BIN=python3
+      - task deps:_need BIN=docker
+    silent: true
+
+  _need:
+    cmds:
+      - type {{ .BIN }} 2>&1 >/dev/null || (echo "Please install {{ .BIN }}"; exit 1)
     silent: true

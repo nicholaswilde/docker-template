@@ -6,44 +6,44 @@ dotenv: ['task.env']
 vars:
   BUILD_DATE:
     sh: "date -u +%Y-%m-%dT%H%M%S%Z"
-  BUILD_ARGS: "--build-arg VERSION={{ .VERSION }} --build-arg CHECKSUM={{ .CHECKSUM }} --build-arg BUILD_DATE={{ .BUILD_DATE }}"
+  BUILD_ARGS: >
+    --build-arg VERSION={{ .VERSION }}
+    --build-arg CHECKSUM={{ .CHECKSUM }}
+    --build-arg BUILD_DATE={{ .BUILD_DATE }}
   TAG_VERSION: "{{ .NS }}/{{ .IMAGE_NAME }}:{{ .VERSION }}-ls{{ .LS }}"
   TAG_LATEST: "{{ .NS }}/{{ .IMAGE_NAME }}:latest"
-  QUAY_VERSION: "quay.io/{{ .TAG_VERSION }}"
-  QUAY_LATEST: "quay.io/{{ .TAG_LATEST }}"
-  GHCR_VERSION: "ghcr.io/{{ .TAG_VERSION }}"
-  GHCR_LATEST: "ghcr.io/{{ .TAG_LATEST }}"
-  URL: "https://github.com/{{ .IMAGE_NAME }}/{{ .IMAGE_NAME }}/releases/download/v{{ .VERSION }}/Leantime-v{{ .VERSION }}.tar.gz"
   CONTAINER: "{{ .CONTAINER_NAME }}-{{ .CONTAINER_INSTANCE }}"
-  RUN: "docker run -it --rm --name {{ .CONTAINER_NAME }}-{{ .CONTAINER_INSTANCE }} {{ .ENV }} {{ .PORTS }}"
+  RUN: >
+    "docker run -it --rm --name
+      {{ .CONTAINER_NAME }}-{{ .CONTAINER_INSTANCE }}
+      {{ .ENV }}
+      {{ .PORTS }}"
   EXEC: "docker exec -it {{ .ENV }} {{ .PORTS }} {{ .CONTAINER }}"
   BUILD: "docker buildx build {{ .BUILD_ARGS }} -t"
 
 includes:
   build: ./.taskfiles/build.yaml
   builder: ./.taskfiles/builder.yaml
+  chk: ./.taskfiles/chk.yaml
   deps: ./.taskfiles/deps.yaml
   pkgs: ./.taskfiles/pkgs.yaml
+  shell: ./.taskfiles/shell.yaml
   snyk: ./.taskfiles/snyk.yaml
 
 tasks:
-
-  print:
-    desc: Build the image
-    cmds:
-      - echo "{{ .QUAY_VERSION }}"
-      - echo "{{ .QUAY_LATEST }}"
-      - echo "{{ .GHCR_VERSION }}"
-      - echo "{{ .GHCR_LATEST }}"
-    preconditions:
-      - sh: 'docker inspect --format "{{ json .State.Running }}" buildx_buildkit_mybuilder0'
-
   build:
     desc: Build the native Docker image
     cmds:
       - "{{ .BUILD }} {{ .TAG_VERSION }} -f Dockerfile ."
     deps:
       - build:build-deps
+
+  checksum:
+    desc: Get the checksum of the release or source package.
+    deps:
+      - chk:_varcheck
+      - chk:_release
+      - chk:_source
 
   date-exec:
     desc: Get the date of the container
@@ -83,9 +83,7 @@ tasks:
   prune:
     desc: Prune the builder
     cmds:
-      - "docker {{ .BUILDER }} prune --all -f"
-    vars:
-      BUILDER: builder
+      - "docker builder prune --all -f"
 
   push:
     desc: Push the image to all repositories
@@ -96,6 +94,11 @@ tasks:
       - "{{ .BUILD }} {{ .QUAY_VERSION }} {{ .PLATFORMS }} -f Dockerfile . --push"
       - "{{ .BUILD }} {{ .GHCR_LATEST }} {{ .PLATFORMS }} -f Dockerfile . --push"
       - "{{ .BUILD }} {{ .GHCR_VERSION }} {{ .PLATFORMS }} -f Dockerfile . --push"
+    vars:
+      QUAY_VERSION: "quay.io/{{ .TAG_VERSION }}"
+      QUAY_LATEST: "quay.io/{{ .TAG_LATEST }}"
+      GHCR_VERSION: "ghcr.io/{{ .TAG_VERSION }}"
+      GHCR_LATEST: "ghcr.io/{{ .TAG_LATEST }}"
 
   readme:
     desc: Update the README.md by replacing template with the image name.
@@ -112,13 +115,8 @@ tasks:
     cmds:
       - "{{ .RUN }} {{ .TAG_LATEST }}"
 
-  shell-exec:
-    desc: Get a shell of a running container
-    cmds:
-      - "{{ .EXEC }} /bin/sh -u 0"
-
-  shell-run:
-    desc: Get a shell of an image
+  shell:
+    desc: Run a shell of an image
     cmds:
       - "{{ .RUN }} --entrypoint /bin/sh -u 0 {{ .TAG_VERSION }}"
 
@@ -131,6 +129,30 @@ tasks:
     desc: Run docker-compose up
     cmds:
       - docker-compose -f docker-compose.sqlite.yaml up
+
+  vars:
+    desc: Print all the variables
+    cmds:
+      - "printf 'task: Available variables for this project:\n'"
+      - 'printf "* BASE               %s\n" "{{ .BASE }}"'
+      - 'printf "* CHECKSUM           %s\n" "{{ .CHECKSUM }}"'
+      - 'printf "* CONTAINER          %s\n" "{{ .CONTAINER }}"'
+      - 'printf "* CONTAINER_INSTANCE %s\n" "{{ .CONTAINER_INSTANCE }}"'
+      - 'printf "* CONTAINER_NAME     %s\n" "{{ .CONTAINER_NAME }}"'
+      - 'printf "* ENV                %s\n" "{{ .ENV }}"'
+      - 'printf "* FILENAME           %s\n" "{{ .FILENAME }}"'
+      - 'printf "* IMAGE_NAME         %s\n" "{{ .IMAGE_NAME }}"'
+      - 'printf "* LS                 %s\n" "{{ .LS }}"'
+      - 'printf "* NS                 %s\n" "{{ .NS }}"'
+      - 'printf "* PACKAGES           %s\n" "{{ .PACKAGES }}"'
+      - 'printf "* PIP                %s\n" "{{ .PIP }}"'
+      - 'printf "* PLATFORMS          %s\n" "{{ .PLATFORMS }}"'
+      - 'printf "* PORTS              %s\n" "{{ .PORTS }}"'
+      - 'printf "* SOURCE_ORG         %s\n" "{{ .SOURCE_ORG }}"'
+      - 'printf "* SOURCE_REPO        %s\n" "{{ .SOURCE_REPO }}"'
+      - 'printf "* TYPE               %s\n" "{{ .TYPE }}"'
+      - 'printf "* VERSION            %s\n" "{{ .VERSION }}"'
+    silent: true
 
   default:
     cmds:

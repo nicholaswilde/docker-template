@@ -5,4 +5,4 @@ tasks:
   exec:
     desc: Get a shell of a running container
     cmds:
-      - "{{ .EXEC }} /bin/sh -u 0"
+      - "{{ .EXEC }} --entrypoint /bin/sh -u 0"
