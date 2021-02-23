@@ -26,9 +26,9 @@ $ docker run -d \
   nicholaswilde/template
 ```
 
-|   user   | uid |
-|:--------:|:---:|
-| www-data |  33 |
+|user | uid |
+|----:|:---:|
+| abc | 911 |
 
 ### docker-compose
 
