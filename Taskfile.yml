@@ -6,27 +6,27 @@ dotenv: ['task.env']
 vars:
   BUILD_DATE:
     sh: "date -u +%Y-%m-%dT%H%M%S%Z"
-  BUILD_ARGS: >
+  BUILD_ARGS: >-
     --build-arg VERSION={{ .VERSION }}
     --build-arg CHECKSUM={{ .CHECKSUM }}
     --build-arg BUILD_DATE={{ .BUILD_DATE }}
   TAG_VERSION: "{{ .NS }}/{{ .IMAGE_NAME }}:{{ .VERSION }}-ls{{ .LS }}"
   TAG_LATEST: "{{ .NS }}/{{ .IMAGE_NAME }}:latest"
   CONTAINER: "{{ .CONTAINER_NAME }}-{{ .CONTAINER_INSTANCE }}"
-  RUN: >
-    "docker run -it --rm --name
-      {{ .CONTAINER_NAME }}-{{ .CONTAINER_INSTANCE }}
-      {{ .ENV }}
-      {{ .PORTS }}"
-  EXEC: "docker exec -it {{ .ENV }} {{ .PORTS }} {{ .CONTAINER }}"
+  RUN: "docker run -it --rm --name {{ .CONTAINER_NAME }}-{{ .CONTAINER_INSTANCE }} {{ .ENV }} {{ .PORTS }}"
+  EXEC: "docker exec -it {{ .CONTAINER }}"
   BUILD: "docker buildx build {{ .BUILD_ARGS }} -t"
 
 includes:
   build: ./.taskfiles/build.yaml
   builder: ./.taskfiles/builder.yaml
   chk: ./.taskfiles/chk.yaml
+  date: ./.taskfiles/date.yaml
   deps: ./.taskfiles/deps.yaml
+  image: ./.taskfiles/image.yaml
+  load: ./.taskfiles/load.yaml
   pkgs: ./.taskfiles/pkgs.yaml
+  run: ./.taskfiles/run.yaml
   shell: ./.taskfiles/shell.yaml
   snyk: ./.taskfiles/snyk.yaml
 
@@ -45,12 +45,7 @@ tasks:
       - chk:_release
       - chk:_source
 
-  date-exec:
-    desc: Get the date of the container
-    cmds:
-      - "{{ .EXEC }} date"
-
-  date-run:
+  date:
     desc: Get the date of the image
     cmds:
       - "{{ .RUN }} --entrypoint date {{ .TAG_VERSION }}"
@@ -60,16 +55,16 @@ tasks:
     cmds:
       - "hadolint Dockerfile"
       - "yamllint ."
+    preconditions:
+      - sh: type hadolint2
+        msg: "hadolint is not installed. Run 'task deps:hadolint'"
+      - sh: type yamllint
+        msg: "yamllint is not installed. Run 'task deps:yamllint'"
 
   load:
     desc: Load the release image
     cmds:
       - "{{ .BUILD }} {{ .TAG_VERSION }} -f Dockerfile . --load"
-
-  load-latest:
-    desc: Load the release image
-    cmds:
-      - "{{ .BUILD }} {{ .TAG_LATEST }} -f Dockerfile . --load"
 
   pre-commit:
     desc: Install pre-commit hooks
@@ -77,8 +72,8 @@ tasks:
       - "pre-commit install"
       - "pre-commit install-hooks"
     preconditions:
-      - sh: pre-commit --version
-        msg: "pre-commit is not installed. Run `task deps:pre-commit`"
+      - sh: type pre-commit
+        msg: "pre-commit is not installed. Run 'task deps:pre-commit'"
 
   prune:
     desc: Prune the builder
@@ -106,14 +101,14 @@ tasks:
       - "sed -i 's/template/{{ .IMAGE_NAME }}/g' README.md"
 
   run:
-    desc: Run the image
+    desc: Run the image in the foreground
     cmds:
       - "{{ .RUN }} {{ .TAG_VERSION }}"
 
-  run-latest:
-    desc: Run the latest image
+  rund:
+    desc: Run the image in the background
     cmds:
-      - "{{ .RUN }} {{ .TAG_LATEST }}"
+      - "{{ .RUN }} -d {{ .TAG_VERSION }}"
 
   shell:
     desc: Run a shell of an image
@@ -134,24 +129,27 @@ tasks:
     desc: Print all the variables
     cmds:
       - "printf 'task: Available variables for this project:\n'"
-      - 'printf "* BASE               %s\n" "{{ .BASE }}"'
-      - 'printf "* CHECKSUM           %s\n" "{{ .CHECKSUM }}"'
-      - 'printf "* CONTAINER          %s\n" "{{ .CONTAINER }}"'
-      - 'printf "* CONTAINER_INSTANCE %s\n" "{{ .CONTAINER_INSTANCE }}"'
-      - 'printf "* CONTAINER_NAME     %s\n" "{{ .CONTAINER_NAME }}"'
-      - 'printf "* ENV                %s\n" "{{ .ENV }}"'
-      - 'printf "* FILENAME           %s\n" "{{ .FILENAME }}"'
-      - 'printf "* IMAGE_NAME         %s\n" "{{ .IMAGE_NAME }}"'
-      - 'printf "* LS                 %s\n" "{{ .LS }}"'
-      - 'printf "* NS                 %s\n" "{{ .NS }}"'
-      - 'printf "* PACKAGES           %s\n" "{{ .PACKAGES }}"'
-      - 'printf "* PIP                %s\n" "{{ .PIP }}"'
-      - 'printf "* PLATFORMS          %s\n" "{{ .PLATFORMS }}"'
-      - 'printf "* PORTS              %s\n" "{{ .PORTS }}"'
-      - 'printf "* SOURCE_ORG         %s\n" "{{ .SOURCE_ORG }}"'
-      - 'printf "* SOURCE_REPO        %s\n" "{{ .SOURCE_REPO }}"'
-      - 'printf "* TYPE               %s\n" "{{ .TYPE }}"'
-      - 'printf "* VERSION            %s\n" "{{ .VERSION }}"'
+      - 'printf "{{ .COLOR }}* BASE\e[m               %s\n" "{{ .BASE }}"'
+      - 'printf "{{ .COLOR }}* CHECKSUM\e[m           %s\n" "{{ .CHECKSUM }}"'
+      - 'printf "{{ .COLOR }}* CONTAINER\e[m          %s\n" "{{ .CONTAINER }}"'
+      - 'printf "{{ .COLOR }}* CONTAINER_INSTANCE\e[m %s\n" "{{ .CONTAINER_INSTANCE }}"'
+      - 'printf "{{ .COLOR }}* CONTAINER_NAME\e[m     %s\n" "{{ .CONTAINER_NAME }}"'
+      - 'printf "{{ .COLOR }}* ENV\e[m                %s\n" "{{ .ENV }}"'
+      - 'printf "{{ .COLOR }}* FILENAME\e[m           %s\n" "{{ .FILENAME }}"'
+      - 'printf "{{ .COLOR }}* GIT_ROOT\e[m           %s\n" "{{ .GIT_ROOT }}"'
+      - 'printf "{{ .COLOR }}* IMAGE_NAME\e[m         %s\n" "{{ .IMAGE_NAME }}"'
+      - 'printf "{{ .COLOR }}* LS\e[m                 %s\n" "{{ .LS }}"'
+      - 'printf "{{ .COLOR }}* NS\e[m                 %s\n" "{{ .NS }}"'
+      - 'printf "{{ .COLOR }}* PACKAGES\e[m           %s\n" "{{ .PACKAGES }}"'
+      - 'printf "{{ .COLOR }}* PIP\e[m                %s\n" "{{ .PIP }}"'
+      - 'printf "{{ .COLOR }}* PLATFORMS\e[m          %s\n" "{{ .PLATFORMS }}"'
+      - 'printf "{{ .COLOR }}* PORTS\e[m              %s\n" "{{ .PORTS }}"'
+      - 'printf "{{ .COLOR }}* SOURCE_ORG\e[m         %s\n" "{{ .SOURCE_ORG }}"'
+      - 'printf "{{ .COLOR }}* SOURCE_REPO\e[m        %s\n" "{{ .SOURCE_REPO }}"'
+      - 'printf "{{ .COLOR }}* TYPE\e[m               %s\n" "{{ .TYPE }}"'
+      - 'printf "{{ .COLOR }}* VERSION\e[m            %s\n" "{{ .VERSION }}"'
+    vars:
+      COLOR: '\e[1;34m' # Blue
     silent: true
 
   default:
