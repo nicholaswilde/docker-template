@@ -26,6 +26,8 @@ $ docker run -d \
   nicholaswilde/template
 ```
 
+## Configuration
+
 |user | uid |
 |----:|:---:|
 | abc | 911 |
