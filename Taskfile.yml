@@ -123,7 +123,7 @@ tasks:
   up:
     desc: Run docker-compose up
     cmds:
-      - docker-compose -f docker-compose.sqlite.yaml up
+      - docker-compose -f docker-compose.yaml up
 
   vars:
     desc: Print all the variables
