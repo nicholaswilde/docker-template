@@ -56,10 +56,11 @@ tasks:
       - "hadolint Dockerfile"
       - "yamllint ."
     preconditions:
-      - sh: type hadolint2
+      - sh: type hadolint
         msg: "hadolint is not installed. Run 'task deps:hadolint'"
       - sh: type yamllint
         msg: "yamllint is not installed. Run 'task deps:yamllint'"
+    silent: true
 
   load:
     desc: Load the release image
