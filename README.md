@@ -8,7 +8,7 @@
 
 A multi-architecture image for [template](https://github.com/nicholaswilde/docker-template).
 
-## Architecutres
+## Architectures
 
 * [x] `armv7`
 * [x] `arm64`
