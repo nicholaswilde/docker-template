@@ -32,15 +32,15 @@ $ docker run -d \
   nicholaswilde/template
 ```
 
+### docker-compose
+
+See [docker-compose.yaml](./docker-compose.yaml).
+
 ## Configuration
 
 |user | uid |
 |----:|:---:|
 | abc | 911 |
-
-### docker-compose
-
-See [docker-compose.yaml](./docker-compose.yaml).
 
 ## Development
 
