@@ -111,6 +111,18 @@ tasks:
     cmds:
       - "{{ .RUN }} -d {{ .TAG_VERSION }}"
 
+  secrets:
+    desc: Upload secrets to repo from pass
+    cmds:
+      - "pass github/login-action | gh secret set CR_PAT"
+      - "pass docker/username | gh secret set DOCKERHUB_USERNAME"
+      - "pass docker/token | gh secret set DOCKERHUB_TOKEN"
+      - "pass quay.io/robot | gh secret set QUAY_USERNAME"
+      - "pass quay.io/token | gh secret set QUAY_TOKEN"
+    preconditions:
+      - type pass
+    silent: true
+
   shell:
     desc: Run a shell of an image
     cmds:
