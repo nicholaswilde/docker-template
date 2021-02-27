@@ -75,6 +75,7 @@ tasks:
     preconditions:
       - sh: type pre-commit
         msg: "pre-commit is not installed. Run 'task deps:pre-commit'"
+  silent: true
 
   prune:
     desc: Prune the builder
