@@ -97,6 +97,12 @@ tasks:
       - task deps:_need BIN=docker
     silent: true
 
+  _secrets-reqs:
+    cmds:
+      - task deps:_need BIN=pass
+      - task deps:_need BIN=gh
+    silent: true
+    
   _need:
     cmds:
       - type {{ .BIN }} 2>&1 >/dev/null || (echo "Please install {{ .BIN }}"; exit 1)
