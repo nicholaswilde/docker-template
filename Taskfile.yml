@@ -163,7 +163,8 @@ tasks:
       - 'printf "{{ .COLOR }}* TYPE\e[m               %s\n" "{{ .TYPE }}"'
       - 'printf "{{ .COLOR }}* VERSION\e[m            %s\n" "{{ .VERSION }}"'
     vars:
-      COLOR: '\e[1;34m' # Blue
+      # Blue
+      COLOR: '\e[1;34m' 
     silent: true
 
   default:
