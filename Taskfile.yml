@@ -120,8 +120,8 @@ tasks:
       - "pass docker/token | gh secret set DOCKERHUB_TOKEN"
       - "pass quay.io/robot | gh secret set QUAY_USERNAME"
       - "pass quay.io/token | gh secret set QUAY_TOKEN"
-    preconditions:
-      - type pass
+    deps:
+      - deps:_secrets-reqs
     silent: true
 
   shell:
