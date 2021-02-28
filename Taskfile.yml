@@ -75,7 +75,7 @@ tasks:
     preconditions:
       - sh: type pre-commit
         msg: "pre-commit is not installed. Run 'task deps:pre-commit'"
-  silent: true
+    silent: true
 
   prune:
     desc: Prune the builder
@@ -164,7 +164,7 @@ tasks:
       - 'printf "{{ .COLOR }}* VERSION\e[m            %s\n" "{{ .VERSION }}"'
     vars:
       # Blue
-      COLOR: '\e[1;34m' 
+      COLOR: '\e[1;34m'
     silent: true
 
   default:
