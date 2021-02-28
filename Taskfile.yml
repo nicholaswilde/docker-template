@@ -102,10 +102,17 @@ tasks:
     cmds:
       - "sed -i 's/template/{{ .IMAGE_NAME }}/g' README.md"
 
+  rm:
+    desc: Remove the image
+    cmds:
+      - "docker rmi -f {{ .TAG_VERSION }}"
+
   run:
     desc: Run the image in the foreground
     cmds:
       - "{{ .RUN }} {{ .TAG_VERSION }}"
+    preconditions:
+      - docker images -q {{ .TAG_VERSION }} 2> /dev/null
 
   rund:
     desc: Run the image in the background
@@ -127,7 +134,9 @@ tasks:
   shell:
     desc: Run a shell of an image
     cmds:
-      - "{{ .RUN }} --entrypoint /bin/sh -u 0 {{ .TAG_VERSION }}"
+      - "{{ .RUN }} --entrypoint /bin/sh -u {{ .U }} {{ .TAG_VERSION }}"
+    vars:
+      U: '{{ default "0" .U }}'
 
   stop:
     desc: Stop a running container

@@ -7,16 +7,18 @@ tasks:
     cmds:
       - "snyk container test {{ .TAG_VERSION }} --file=Dockerfile"
     deps:
-      - snyk-deps
+      - :load
+      - _snyk-deps
 
   monitor:
     desc: Monitor the image with snyk
     cmds:
       - "snyk container monitor {{ .TAG_VERSION }}"
     deps:
-      - snyk-deps
+      - :load
+      - _snyk-deps
 
-  snyk-deps:
+  _snyk-deps:
     preconditions:
       - sh: "snyk version"
         msg: "snyk is not installed"
