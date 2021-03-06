@@ -148,7 +148,7 @@ tasks:
     cmds:
       - docker-compose -f docker-compose.yaml up
     deps:
-      - build:latest
+      - load:latest
 
   vars:
     desc: Print all the variables
