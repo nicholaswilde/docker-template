@@ -44,11 +44,11 @@ See [docker-compose.yaml](./docker-compose.yaml).
 
 ## Development
 
-See [Wiki](https://github.com/nicholaswilde/docker-template/wiki/Development).
+See [Wiki](https://nicholaswilde.io/docker-docs/development/).
 
 ## Troubleshooting
 
-See [Wiki](https://github.com/nicholaswilde/docker-template/wiki/Troubleshooting).
+See [Wiki](https://nicholaswilde.io/docker-docs/troubleshooting/).
 
 ## Pre-commit hook
 
