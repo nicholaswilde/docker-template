@@ -1,9 +1,9 @@
 ---
 name: Feature Request
 about: Suggest an idea for this template
-title: '[Feature Request] '
+title: "[Feature Request] "
 labels: enhancement
-assignees: 'nicholaswilde'
+assignees: nicholaswilde
 
 ---
 
