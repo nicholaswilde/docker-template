@@ -1,0 +1,28 @@
+---
+name: Bug report
+about: Create a report to help us improve
+title: '[chart name] bug description'
+labels: :bug: bug
+assignees: 'nicholaswilde'
+
+---
+
+# Details
+
+**Container name and tag:**
+
+<!-- Note: This should be the container image version you have deployed. e.g. linuxserver/jackett:v0.16.2106 -->
+
+**What steps did you take and what happened:**
+
+<!-- Note: This should be a clear and concise description of what the bug is. -->
+
+**What did you expect to happen:**
+
+**Anything else you would like to add:**
+
+<!-- Note: Miscellaneous information that will assist in solving the issue. -->
+
+**Additional Information:**
+
+<!-- Note: Anything to give further context to the bug report. -->
