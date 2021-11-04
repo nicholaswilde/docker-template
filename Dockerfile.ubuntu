@@ -1,4 +1,4 @@
-FROM ubuntu:20.04 as dl
+FROM ubuntu:22.04 as dl
 ARG VERSION
 ARG CHECKSUM=12f8e5c322d3b42104cb234f92f9ae9e9c228adbd8bfc8d2c52dd2bbbdb99f94
 ARG FILENAME="${VERSION}.tar.gz"
