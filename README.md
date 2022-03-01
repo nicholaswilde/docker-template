@@ -67,4 +67,4 @@ Currently, this only works on `amd64` systems.
 [Apache 2.0 License](./LICENSE)
 
 ## Author
-This project was started in 2021 by [Nicholas Wilde](https://github.com/nicholaswilde/).
+This project was started in 2022 by [Nicholas Wilde](https://github.com/nicholaswilde/).
